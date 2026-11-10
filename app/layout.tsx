@@ -7,6 +7,7 @@ import { gitlabmono } from "./assets/font/font";
 import Navbar from "./components/global/Navbar";
 import Footer from "./components/global/Footer";
 import { Providers } from "./providers";
+import { site } from "./data/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,12 +16,10 @@ const inter = Inter({
 });
 
 const options = {
-  title: "Victor Eke | Software Developer",
-  description:
-    "Victor Eke is a Software Developer and Technical Writer who is passionate about building solutions and contributing to open source communities",
-  url: "https://victoreke.com",
-  ogImage:
-    "https://res.cloudinary.com/victoreke/image/upload/v1692635746/victoreke/og.png",
+  title: site.title,
+  description: site.description,
+  url: site.url,
+  ogImage: site.ogImage,
 };
 
 export const metadata: Metadata = {
@@ -30,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: options.title,
     url: options.url,
-    siteName: "victoreke.com",
+    siteName: site.shortName,
     locale: "en-US",
     type: "website",
     description: options.description,
@@ -38,9 +37,6 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: options.url,
-  },
-  other: {
-    "google-site-verification": "IzcWMgn5Qjf-LCtA337KTGjivsf9bmod_1pZ-jxYQh8",
   },
 };
 
@@ -60,11 +56,13 @@ export default function RootLayout({
           <Footer />
         </Providers>
       </body>
-      <Script
-        defer
-        src="https://cloud.umami.is/script.js"
-        data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-      />
+      {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ? (
+        <Script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+        />
+      ) : null}
     </html>
   );
 }

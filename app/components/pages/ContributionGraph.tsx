@@ -26,8 +26,9 @@ export default function ContributionGraph() {
   }, [scheme]);
 
   const today = new Date().getFullYear();
-  const username = process.env.NEXT_PUBLIC_GITHUB_USERNAME;
-  const joinYear = Number(process.env.NEXT_PUBLIC_GITHUB_JOIN_YEAR);
+  const username =
+    process.env.NEXT_PUBLIC_GITHUB_USERNAME || "abdifatah-com";
+  const joinYear = Number(process.env.NEXT_PUBLIC_GITHUB_JOIN_YEAR || "2024");
   const years = getGitHubYears(joinYear);
 
   if (!username || !joinYear)

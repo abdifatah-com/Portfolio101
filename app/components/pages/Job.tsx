@@ -1,18 +1,14 @@
 import Image from "next/image";
-import { jobQuery } from "@/lib/sanity.query";
 import type { JobType } from "@/types";
 import { formatDate } from "../../utils/date";
 import { Slide } from "../../animation/Slide";
-import { sanityFetch } from "@/lib/sanity.client";
 import RefLink from "../shared/RefLink";
 import EmptyState from "../shared/EmptyState";
 import { RiBriefcase3Fill } from "react-icons/ri";
+import { getJobs } from "@/lib/content";
 
 export default async function Job() {
-  const jobs: JobType[] = await sanityFetch({
-    query: jobQuery,
-    tags: ["job"],
-  });
+  const jobs: JobType[] = getJobs();
 
   return (
     <section className="mt-32">

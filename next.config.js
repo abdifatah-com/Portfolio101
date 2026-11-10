@@ -3,6 +3,7 @@ const nextConfig = {};
 
 module.exports = {
   images: {
+    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -13,6 +14,9 @@ module.exports = {
       { hostname: "res.cloudinary.com" },
       { hostname: "www.google.com" },
       { hostname: "images.unsplash.com" },
+      { hostname: "github.com" },
+      { hostname: "avatars.githubusercontent.com" },
+      { hostname: "abdifatah.site" },
     ],
   },
 };

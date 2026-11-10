@@ -4,17 +4,19 @@ import Posts from "../components/pages/Posts";
 import Social from "../components/shared/Social";
 import { Slide } from "../animation/Slide";
 import PageHeading from "@/app/components/shared/PageHeading";
+import { site } from "../data/site";
 
 export const metadata: Metadata = {
-  title: "Blog | Victor Eke",
-  metadataBase: new URL("https://victoreke.com/blog"),
-  description: "Read latest stories from Victor Eke's Blog",
+  title: `Blog | ${site.name}`,
+  metadataBase: new URL(`${site.url}/blog`),
+  description:
+    "Exploring the latest in web development, design, and technology.",
   openGraph: {
-    title: "Blog | Victor Eke",
-    url: "https://victoreke.com/blog",
-    description: "Read latest stories from Victor Eke's Blog",
-    images:
-      "https://res.cloudinary.com/victoreke/image/upload/v1692636087/victoreke/blog.png",
+    title: `Blog | ${site.name}`,
+    url: `${site.url}/blog`,
+    description:
+      "Exploring the latest in web development, design, and technology.",
+    images: site.ogImage,
   },
 };
 
@@ -23,7 +25,7 @@ export default async function Blog() {
     <main className="max-w-7xl mx-auto md:px-16 px-6">
       <PageHeading
         title="Blog"
-        description="Welcome to my blog domain where I share personal stories about things I've learned, projects I'm hacking on and just general findings. I also write for other publications."
+        description="Tech insights and articles on frontend development, design systems, performance, and the tools shaping how we build for the web."
       >
         <Social type="publication" />
       </PageHeading>

@@ -1,23 +1,19 @@
 import Image from "next/legacy/image";
 import Link from "next/link";
-import { postsQuery } from "@/lib/sanity.query";
 import { PostType } from "@/types";
 import EmptyState from "../shared/EmptyState";
-import { BiSolidTime, BiTime } from "react-icons/bi";
+import { BiSolidTime } from "react-icons/bi";
 import { formatDate } from "../../utils/date";
 import { HiCalendar } from "react-icons/hi";
-import { sanityFetch } from "@/lib/sanity.client";
 import { readTime } from "@/app/utils/readTime";
 import { toPlainText } from "@portabletext/react";
+import { getPosts } from "@/lib/content";
+import { site } from "@/app/data/site";
 
-const fallbackImage: string =
-  "https://res.cloudinary.com/victoreke/image/upload/v1692608339/victoreke/blog.png";
+const fallbackImage = site.ogImage;
 
 export default async function Posts() {
-  const posts: PostType[] = await sanityFetch({
-    query: postsQuery,
-    tags: ["Post"],
-  });
+  const posts: PostType[] = getPosts();
 
   return (
     <section>
@@ -36,7 +32,7 @@ export default async function Posts() {
                       className="dark:bg-zinc-800 bg-zinc-100 rounded-md object-cover group-hover:scale-125 duration-300"
                       alt={post.coverImage?.alt || post.title}
                       layout="fill"
-                      placeholder={post.coverImage ? "blur" : "empty"}
+                      placeholder={post.coverImage?.lqip ? "blur" : "empty"}
                       blurDataURL={post.coverImage?.lqip || ""}
                     />
                   </div>

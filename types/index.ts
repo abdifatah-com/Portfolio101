@@ -97,3 +97,32 @@ export type HeroeType = {
   url: string;
   met: boolean;
 };
+
+export type AchievementType = {
+  id: string;
+  title: string;
+  subtitle: string;
+  category: "Hackathon" | "Award" | "Community" | "Speaking" | "Project";
+  award?: string;
+  prize?: string;
+  organizer: string;
+  date: string;
+  year: string;
+  image?: string;
+  summary: string;
+  highlights: string[];
+  tags: string[];
+  badge?: string;
+  link?: string;
+};
+
+export type GalleryPhotoType = {
+  id: string;
+  src: string;
+  title: string;
+  caption: string;
+  category: string;
+  date: string;
+  featured?: boolean;
+};
+

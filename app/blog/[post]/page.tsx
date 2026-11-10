@@ -3,21 +3,20 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { PostType } from "@/types";
-import { singlePostQuery } from "@/lib/sanity.query";
 import { PortableText, toPlainText } from "@portabletext/react";
 import { CustomPortableText } from "../../components/shared/CustomPortableText";
-import { BiChevronRight, BiSolidTime, BiTime } from "react-icons/bi";
+import { BiChevronRight, BiSolidTime } from "react-icons/bi";
 import { formatDate } from "../../utils/date";
 import SharePost from "../../components/shared/SharePost";
 import FeaturedPosts from "../../components/pages/FeaturedPosts";
 import { Slide } from "../../animation/Slide";
-import { urlFor } from "@/lib/sanity.image";
 import Buymeacoffee from "@/app/components/shared/Buymeacoffee";
 import Comments from "@/app/components/shared/Comments";
 import { HiCalendar, HiChat } from "react-icons/hi";
-import { sanityFetch } from "@/lib/sanity.client";
 import { readTime } from "@/app/utils/readTime";
 import PageHeading from "@/app/components/shared/PageHeading";
+import { getPost, getPosts } from "@/lib/content";
+import { site } from "@/app/data/site";
 
 type Props = {
   params: {
@@ -25,17 +24,14 @@ type Props = {
   };
 };
 
-const fallbackImage: string =
-  "https://res.cloudinary.com/victoreke/image/upload/v1692636087/victoreke/blog.png";
+const fallbackImage = site.ogImage;
 
-// Dynamic metadata for SEO
+export async function generateStaticParams() {
+  return getPosts().map((post) => ({ post: post.slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = params.post;
-  const post: PostType = await sanityFetch({
-    query: singlePostQuery,
-    tags: ["Post"],
-    qParams: { slug },
-  });
+  const post = getPost(params.post);
 
   if (!post) {
     notFound();
@@ -43,23 +39,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${post.title}`,
-    metadataBase: new URL(`https://victoreke.com/blog/${post.slug}`),
+    metadataBase: new URL(`${site.url}/blog/${post.slug}`),
     description: post.description,
     publisher: post.author.name,
     keywords: post.tags,
     alternates: {
-      canonical:
-        post.canonicalLink || `https://victoreke.com/blog/${post.slug}`,
+      canonical: post.canonicalLink || `${site.url}/blog/${post.slug}`,
     },
     openGraph: {
-      images:
-        urlFor(post.coverImage?.image).width(1200).height(630).url() ||
-        fallbackImage,
-      url: `https://victoreke.com/blog/${post.slug}`,
+      images: post.coverImage?.image || fallbackImage,
+      url: `${site.url}/blog/${post.slug}`,
       title: post.title,
       description: post.description,
       type: "article",
-      siteName: "victoreke.com",
+      siteName: site.shortName,
       authors: post.author.name,
       tags: post.tags,
       publishedTime: post._createdAt,
@@ -68,29 +61,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       title: post.title,
       description: post.description,
-      images:
-        urlFor(post.coverImage?.image).width(680).height(340).url() ||
-        fallbackImage,
-      creator: `@${post.author.twitterUrl.split("twitter.com/")[1]}`,
-      site: `@${post.author.twitterUrl.split("twitter.com/")[1]}`,
+      images: post.coverImage?.image || fallbackImage,
       card: "summary_large_image",
     },
   };
 }
 
 export default async function Post({ params }: Props) {
-  const slug = params.post;
-  const post: PostType = await sanityFetch({
-    query: singlePostQuery,
-    tags: ["Post"],
-    qParams: { slug },
-  });
-
-  const words = toPlainText(post.body);
+  const post: PostType | undefined = getPost(params.post);
 
   if (!post) {
     notFound();
   }
+
+  const words = toPlainText(post.body);
 
   return (
     <main className="max-w-7xl mx-auto md:px-16 px-6">
@@ -162,10 +146,7 @@ export default async function Post({ params }: Props) {
               <address className="flex items-center gap-x-3 mt-4 not-italic">
                 <div className="relative w-12 h-12">
                   <Image
-                    src={urlFor(post.author.photo.image)
-                      .width(80)
-                      .height(80)
-                      .url()}
+                    src={post.author.photo.image}
                     alt={post.author.photo.alt}
                     layout="fill"
                     className="dark:bg-zinc-800 bg-zinc-300 rounded-full object-cover"
@@ -181,7 +162,7 @@ export default async function Post({ params }: Props) {
                     rel="noreferrer noopener"
                     target="_blank"
                   >
-                    {`@${post.author.twitterUrl.split("twitter.com/")[1]}`}
+                    LinkedIn
                   </a>
                 </div>
               </address>

@@ -1,33 +1,16 @@
-"use client";
-
-import { useTheme } from "next-themes";
-import Giscus from "@giscus/react";
-import { giscusRepoId, giscusCategoryId } from "@/lib/env.api";
+import { site } from "@/app/data/site";
 
 export default function Comments() {
-  const theme = useTheme();
-  const giscusTheme =
-    theme.theme === "light"
-      ? "light"
-      : theme.theme === "dark"
-      ? "transparent_dark"
-      : "dark";
-
   return (
-    <Giscus
-      id="comments"
-      repo="evavic44/victoreke.com"
-      repoId={giscusRepoId}
-      category="Announcements"
-      categoryId={giscusCategoryId}
-      mapping="title"
-      term="Welcome to @giscus/react component!"
-      reactionsEnabled="1"
-      emitMetadata="0"
-      inputPosition="bottom"
-      theme={giscusTheme}
-      lang="en"
-      loading="lazy"
-    />
+    <p className="dark:text-zinc-400 text-zinc-600">
+      Want to continue the conversation? Email me at{" "}
+      <a
+        href={`mailto:${site.email}`}
+        className="dark:text-primary-color text-tertiary-color hover:underline"
+      >
+        {site.email}
+      </a>
+      .
+    </p>
   );
 }

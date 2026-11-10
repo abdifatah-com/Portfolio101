@@ -1,37 +1,33 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
-import { projectsQuery } from "@/lib/sanity.query";
 import type { ProjectType } from "@/types";
 import EmptyState from "../components/shared/EmptyState";
 import { Slide } from "../animation/Slide";
-import { sanityFetch } from "@/lib/sanity.client";
 import PageHeading from "../components/shared/PageHeading";
+import { getProjects } from "@/lib/content";
+import { site } from "../data/site";
 
 export const metadata: Metadata = {
-  title: "Project | Victor Eke",
-  metadataBase: new URL("https://victoreke.com/projects"),
-  description: "Explore projects built by Victor Eke",
+  title: `Projects | ${site.name}`,
+  metadataBase: new URL(`${site.url}/projects`),
+  description: `Explore projects built by ${site.name}`,
   openGraph: {
-    title: "Projects | Victor Eke",
-    url: "https://victoreke.com/projects",
-    description: "Explore projects built by Victor Eke",
-    images:
-      "https://res.cloudinary.com/victoreke/image/upload/v1692636087/victoreke/projects.png",
+    title: `Projects | ${site.name}`,
+    url: `${site.url}/projects`,
+    description: `Explore projects built by ${site.name}`,
+    images: site.ogImage,
   },
 };
 
 export default async function Project() {
-  const projects: ProjectType[] = await sanityFetch({
-    query: projectsQuery,
-    tags: ["project"],
-  });
+  const projects: ProjectType[] = getProjects();
 
   return (
     <main className="max-w-7xl mx-auto md:px-16 px-6">
       <PageHeading
         title="Projects"
-        description="I've worked on tons of little projects over the years but these are the ones that I'm most proud of. Many of them are open-source, so if you see something that piques your interest, check out the code and contribute if you have ideas on how it can be improved."
+        description="A collection of my recent work and open-source contributions, from product UIs to experiments in TypeScript, JavaScript, and Python."
       />
 
       <Slide delay={0.1}>
@@ -41,24 +37,21 @@ export default async function Project() {
               <Link
                 href={`/projects/${project.slug}`}
                 key={project._id}
-                className="flex items-center gap-x-4 dark:bg-primary-bg bg-zinc-50 border border-transparent dark:hover:border-zinc-700 hover:border-zinc-200 p-4 rounded-lg"
+                className="flex items-center gap-x-4 dark:bg-primary-bg bg-zinc-50 border border-transparent dark:hover:border-zinc-700 hover:border-zinc-200 p-4 rounded-xl transition-all duration-300 group"
               >
-                {project.logo ? (
+                <div className="relative w-14 h-14 shrink-0 rounded-lg overflow-hidden border dark:border-zinc-800 border-zinc-200 bg-zinc-900">
                   <Image
-                    src={project.logo}
-                    width={60}
-                    height={60}
+                    src={project.coverImage?.image ?? "/projects/dhidib-foundation.svg"}
+                    fill
                     alt={project.name}
-                    className="dark:bg-zinc-800 bg-zinc-100 rounded-md p-2"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                ) : (
-                  <div className="dark:bg-primary-bg bg-zinc-50 border border-transparent dark:hover:border-zinc-700 hover:border-zinc-200 p-2 rounded-lg text-3xl">
-                    🪴
-                  </div>
-                )}
+                </div>
                 <div>
-                  <h2 className="text-lg tracking-wide mb-1">{project.name}</h2>
-                  <div className="text-sm dark:text-zinc-400 text-zinc-600">
+                  <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 mb-1 group-hover:text-primary-color dark:group-hover:text-primary-color transition-colors">
+                    {project.name}
+                  </h2>
+                  <div className="text-xs sm:text-sm dark:text-zinc-400 text-zinc-600 line-clamp-2">
                     {project.tagline}
                   </div>
                 </div>

@@ -1,13 +1,13 @@
 import Image from "next/image";
 import { Metadata } from "next";
-import { singleProjectQuery } from "@/lib/sanity.query";
+import { notFound } from "next/navigation";
 import type { ProjectType } from "@/types";
 import { PortableText } from "@portabletext/react";
 import { CustomPortableText } from "@/app/components/shared/CustomPortableText";
 import { Slide } from "../../animation/Slide";
-import { urlFor } from "@/lib/sanity.image";
-import { sanityFetch } from "@/lib/sanity.client";
 import { BiLinkExternal, BiLogoGithub } from "react-icons/bi";
+import { getProject, getProjects } from "@/lib/content";
+import { site } from "@/app/data/site";
 
 type Props = {
   params: {
@@ -15,27 +15,26 @@ type Props = {
   };
 };
 
-const fallbackImage: string =
-  "https://res.cloudinary.com/victoreke/image/upload/v1692636087/victoreke/projects.png";
+const fallbackImage = "/projects/dhidib-foundation.svg";
 
-// Dynamic metadata for SEO
+export async function generateStaticParams() {
+  return getProjects().map((project) => ({ project: project.slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = params.project;
-  const project: ProjectType = await sanityFetch({
-    query: singleProjectQuery,
-    tags: ["project"],
-    qParams: { slug },
-  });
+  const project = getProject(params.project);
+
+  if (!project) {
+    return { title: "Project" };
+  }
 
   return {
     title: `${project.name} | Project`,
-    metadataBase: new URL(`https://victoreke.com/projects/${project.slug}`),
+    metadataBase: new URL(`${site.url}/projects/${project.slug}`),
     description: project.tagline,
     openGraph: {
-      images: project.coverImage
-        ? urlFor(project.coverImage.image).width(1200).height(630).url()
-        : fallbackImage,
-      url: `https://victoreke.com/projects/${project.slug}`,
+      images: project.coverImage?.image || fallbackImage,
+      url: `${site.url}/projects/${project.slug}`,
       title: project.name,
       description: project.tagline,
     },
@@ -43,12 +42,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Project({ params }: Props) {
-  const slug = params.project;
-  const project: ProjectType = await sanityFetch({
-    query: singleProjectQuery,
-    tags: ["project"],
-    qParams: { slug },
-  });
+  const project: ProjectType | undefined = getProject(params.project);
+
+  if (!project) {
+    notFound();
+  }
 
   return (
     <main className="max-w-6xl mx-auto lg:px-16 px-8">
@@ -61,7 +59,7 @@ export default async function Project({ params }: Props) {
 
             <div className="flex items-center gap-x-2">
               <a
-                href={project.projectUrl}
+                href={project.projectUrl || undefined}
                 rel="noreferrer noopener"
                 target="_blank"
                 className={`flex items-center gap-x-2 dark:bg-primary-bg bg-secondary-bg dark:text-white text-zinc-700 border border-transparent rounded-md px-4 py-2 duration-200 ${
@@ -75,7 +73,7 @@ export default async function Project({ params }: Props) {
               </a>
 
               <a
-                href={project.repository}
+                href={project.repository || undefined}
                 rel="noreferrer noopener"
                 target="_blank"
                 className={`flex items-center gap-x-2 dark:bg-primary-bg bg-secondary-bg dark:text-white text-zinc-700 border border-transparent rounded-md px-4 py-2 duration-200 ${
@@ -90,15 +88,14 @@ export default async function Project({ params }: Props) {
             </div>
           </div>
 
-          <div className="relative w-full h-40 pt-[52.5%]">
+          <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden border dark:border-zinc-800 border-zinc-200">
             <Image
-              className="rounded-xl border dark:border-zinc-800 border-zinc-100 object-cover"
+              className="object-cover"
               fill
               src={project.coverImage?.image ?? fallbackImage}
               alt={project.coverImage?.alt ?? project.name}
               quality={100}
-              placeholder={project.coverImage?.lqip ? `blur` : "empty"}
-              blurDataURL={project.coverImage?.lqip || ""}
+              priority
             />
           </div>
 

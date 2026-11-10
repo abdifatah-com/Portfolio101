@@ -1,24 +1,18 @@
 import Link from "next/link";
 import Image from "next/legacy/image";
-import { postsQuery } from "@/lib/sanity.query";
 import type { PostType } from "@/types";
-import { sanityFetch } from "@/lib/sanity.client";
+import { getFeaturedPosts } from "@/lib/content";
 
 export default async function FeaturedPosts({ params }: { params?: string }) {
-  const featuredPosts: PostType[] = await sanityFetch({
-    query: postsQuery,
-    tags: ["Post"],
-  });
+  const featuredPosts: PostType[] = getFeaturedPosts();
 
   return (
     <>
       {featuredPosts.map((post) =>
-        post.featured !== true || post.isPublished !== true ? null : (
+        post.slug === params ? null : (
           <article
             key={post._id}
-            className={`mb-4 ${
-              post.slug === params ? "hidden" : "flex lg:flex-row flex-col"
-            }`}
+            className="mb-4 flex lg:flex-row flex-col"
           >
             <Link
               href={`/blog/${post.slug}`}
@@ -30,7 +24,7 @@ export default async function FeaturedPosts({ params }: { params?: string }) {
                 alt={post.coverImage?.alt || post.title}
                 width={400}
                 height={230}
-                placeholder={post.coverImage ? "blur" : "empty"}
+                placeholder={post.coverImage?.lqip ? "blur" : "empty"}
                 blurDataURL={post.coverImage?.lqip || ""}
                 quality={100}
                 loading="lazy"
